@@ -447,7 +447,7 @@ function menuManageThis() {
         target=$(pwd)
         cd $target/..
         rm -r $target
-        su osmc -c -- 'git clone https://github.com/hissingshark/retrOSMCmk2.git'
+        su osmc -c -- 'git clone https://github.com/mbarnes/retrOSMCmk2.git'
         cd $target
         # restore our submodule now or firstTimeSetup will re-clone it
         mv /tmp/RetroPie-Setup submodule/

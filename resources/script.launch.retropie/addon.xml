@@ -15,7 +15,7 @@
 		<language></language>
 		<forum>https://discourse.osmc.tv/t/how-to-retrosmcmk2-a-retropie-installer-on-the-vero4k/82357</forum>
 		<source>https://github.com/hissingshark/script.launch.retropie</source>
-		<website>https://github.com/hissingshark/retrOSMCmk2</website>
+		<website>https://github.com/mbarnes/retrOSMCmk2</website>
 		<email>retrosmcmk2@hissingshark.co.uk</email>
 		<assets>
 			<icon>resources/icon.png</icon>

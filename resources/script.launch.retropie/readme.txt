@@ -20,4 +20,4 @@ KNOWN ISSUES:
 
 
 Installation is via the RetroPie installer:
-https://github.com/hissingshark/retrOSMCmk2
+https://github.com/mbarnes/retrOSMCmk2

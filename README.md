@@ -19,7 +19,7 @@ From the console:
 Step 1.
 ``` bash
 sudo apt-get install git
-git clone https://github.com/hissingshark/retrOSMCmk2.git
+git clone https://github.com/mbarnes/retrOSMCmk2.git
 cd retrOSMCmk2
 sudo ./setup.sh
 ```
