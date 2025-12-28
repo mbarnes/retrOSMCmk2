@@ -6,7 +6,7 @@
 #############
 
 LOGO='retrOSMCmk2'
-BACKTITLE="$LOGO - Installing RetroPie on your Vero4K"
+BACKTITLE="$LOGO - Installing RetroPie on your" # will append this with system name once established at runtime
 DIALOG_OK=0
 DIALOG_CANCEL=1
 DIALOG_ESC=255
@@ -27,7 +27,7 @@ reinstall_sdl2=0
 function firstTimeSetup() {
   # get dependancies
   echo -e "\nFirst time setup:\n\nInstalling required dependancies..."
-  depends=(dialog evtest git zip gpg)
+  depends=(dialog evtest git zip gpg gpg-agent)
   if [[ "$platform" == rpi* ]]; then
     depends+=(alsa-utils)
   fi
@@ -51,7 +51,7 @@ function firstTimeSetup() {
       \nInstalling RetroPie-Setup...\n\
       " 0 0
     sleep 2
-    su osmc -c -- 'git -C submodule/ clone https://github.com/RetroPie/RetroPie-Setup.git' || { echo "FAILED!"; exit 1; }
+    su osmc -c -- 'git -C submodule/ clone -b retrosmcmk2 https://github.com/hissingshark/RetroPie-Setup.git' || { echo "FAILED!"; exit 1; }
     clear
     dialog \
       --backtitle "$BACKTITLE" \
@@ -240,10 +240,10 @@ function patchRetroPie() {
   sed -i '/if \[\[ "$__os_id" != "Raspbian" ]] && ! isPlatform "armv6"; then/,/fi/s/emulationstation|//' submodule/RetroPie-Setup/scriptmodules/packages.sh
 
 
-  # RPi2/3 and Vero4k patches
-  if [[ "$platform" == rpi[2..3] || "$platform" == "vero4k" ]]; then
+  # RPi2/3 and Vero 4K/4K+/5 patches
+  if [[ "$platform" == rpi[2..3] || "$platform" == "vero4k" || "$platform" == "vero5" ]]; then
     # PATCH R23V1
-    # RetroPie no longer host the RPi2/3 binaries because OSMC is running the unsupported GL drivers - so we provide them as well as Vero4k
+    # RetroPie no longer host the RPi2/3 binaries because OSMC is running the unsupported GL drivers - so we provide them as well as Vero4k/4k+/5
     # Let RetroPie handle RPi4
     sed -i '/__binary_host="/s/.*/__binary_host="download.osmc.tv\/dev\/hissingshark"/' submodule/RetroPie-Setup/scriptmodules/system.sh
     sed -i '/__has_binaries=/s/0/1/' submodule/RetroPie-Setup/scriptmodules/system.sh
@@ -261,11 +261,10 @@ function patchRetroPie() {
   sed -i '/function get_ver_sdl2() {/,/}/s/echo ".*"/echo "2.0.20"/' submodule/RetroPie-Setup/scriptmodules/supplementary/sdl2.sh
   sed -i '/function get_pkg_ver_sdl2() {/,/}/s/"+.*"/"+1"/' submodule/RetroPie-Setup/scriptmodules/supplementary/sdl2.sh
 
+
   # No more patches affecting RPi
   [[ "$platform" == rpi* ]] && return 0
-
-
-  # All following patches must be for the Vero4K
+  # SO, all following patches must be for the Vero 4K/4K+/5
   # PATCH V1
   # use tvservice-shim and fbset-shim instead of the real thing and handle TTY selection
   if [[ -e  "/opt/retropie/supplementary/runcommand/runcommand.sh" ]]; then
@@ -517,23 +516,33 @@ case "$(sed -n '/^Hardware/s/^.*: \(.*\)/\1/p' < /proc/cpuinfo)" in
     case $cpu in
       1)
         platform="rpi2"
+        PLATFORM="RPi2"
         ;;
       2)
         platform="rpi3"
+        PLATFORM="RPi3"
         ;;
       3)
         platform="rpi4"
+        PLATFORM="RPi4"
         ;;
     esac
     ;;
   *Vero*4K*)
-    platform="vero4k"
+  platform="vero4k"
+  PLATFORM="Vero 4K"
+    ;;
+  *Vero*V*)
+  platform="vero5"
+  PLATFORM="Vero V"
+  [[ -d '/opt/vero5' ]] && [[ ! -h '/opt/vero3' ]] && ln -s /opt/vero5 /opt/vero3
     ;;
   *)
-    echo -e "*****\nUnknown platform!  $LOGO supports:\nRPi(2/3/4)\nVero (4K/4K+)\n*****\n"
+    echo -e "*****\nUnknown platform!  $LOGO supports:\nRPi(2/3/4)\nVero (4K/4K+/V)\n*****\n"
     exit 1
     ;;
 esac
+BACKTITLE="$BACKTITLE $PLATFORM"
 
 # all operations performed relative to this script
 pushd $(dirname "${BASH_SOURCE[0]}") >/dev/null
